@@ -1,15 +1,23 @@
 import { google, clouderrorreporting_v1beta1 } from "googleapis";
+import { Credentials } from "./crentials";
 
-// The file is excluded from the repository, so you need to create it yourself
-const SERVICE_ACCOUNT_KEY_FILE = "./credentials.json";
+async function getErrorReportingClient(
+  credentials: Credentials
+): Promise<clouderrorreporting_v1beta1.Clouderrorreporting> {
+  try {
+    const auth = new google.auth.GoogleAuth({
+      credentials,
+      scopes: ["https://www.googleapis.com/auth/cloud-platform"],
+    });
 
-async function getErrorReportingClient(): Promise<clouderrorreporting_v1beta1.Clouderrorreporting> {
-  const auth = new google.auth.GoogleAuth({
-    keyFile: SERVICE_ACCOUNT_KEY_FILE,
-    scopes: ["https://www.googleapis.com/auth/cloud-platform"],
-  });
+    return google.clouderrorreporting({ version: "v1beta1", auth });
+  } catch (error) {
+    console.error("Failed to retrieve error reporting client:", error);
 
-  return google.clouderrorreporting({ version: "v1beta1", auth });
+    throw new Error(
+      "Unable to authenticate or retrieve error reporting client. Check credentials."
+    );
+  }
 }
 
 export default getErrorReportingClient;
